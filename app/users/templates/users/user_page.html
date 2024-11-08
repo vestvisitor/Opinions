@@ -6,7 +6,7 @@
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Hugo 0.122.0">
-    <title>Album example · Bootstrap v5.3</title>
+    <title>{{ user.username }}'s page</title>
 
     <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/album/">
 
@@ -101,8 +101,8 @@
     </style>
 
   </head>
-        <body>
-          <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+    <body>
+        <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
             <symbol id="check2" viewBox="0 0 16 16">
               <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
             </symbol>
@@ -116,9 +116,8 @@
             <symbol id="sun-fill" viewBox="0 0 16 16">
               <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"/>
             </symbol>
-          </svg>
+        </svg>
 
-      {% block navbar %}
       <header data-bs-theme="dark">
         <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
             <div class="container-fluid">
@@ -177,28 +176,87 @@
             </div>
         </nav>
     </header>
-      {% endblock %}
 
       <main>
-
         <div class="album bg-body-tertiary">
           <div class="container">
-
-
+              <section class="h-100 gradient-custom-2">
+                  <div class="container py-5 h-100">
+                    <div class="row d-flex justify-content-center">
+                      <div class="col col-lg-9 col-xl-8">
+                        <div class="card">
+                          <div class="rounded-top text-white d-flex flex-row" style="background-color: #000; height:200px;">
+                            <div class="ms-4 mt-5 d-flex flex-column" style="width: 150px;">
+                              <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-1.webp"
+                                alt="Generic placeholder image" class="img-fluid img-thumbnail mt-4 mb-2"
+                                style="width: 150px; z-index: 1">
+                              <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-dark text-body" data-mdb-ripple-color="dark" style="z-index: 1;">
+                                Contact
+                              </button>
+                            </div>
+                            <div class="ms-3" style="margin-top: 130px;">
+                              <h5>{{ user.username }}</h5>
+                              <p>Profile</p>
+                            </div>
+                          </div>
+                          <div class="p-4 text-black bg-body-tertiary">
+                            <div class="d-flex justify-content-end text-center py-1 text-body">
+                              <div>
+                                <p class="mb-1 h5">253</p>
+                                <p class="small text-muted mb-0">Cases</p>
+                              </div>
+                              <div class="px-3">
+                                <p class="mb-1 h5">1026</p>
+                                <p class="small text-muted mb-0">Opinions</p>
+                              </div>
+                              <div>
+                                <p class="mb-1 h5">478</p>
+                                <p class="small text-muted mb-0">Reputation</p>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="card-body p-4 text-black">
+                            <div class="mb-5  text-body">
+                              <p class="lead fw-normal mb-1">About</p>
+                              <div class="p-4 bg-body-tertiary">
+                                <p class="font-italic mb-1">Web Developer</p>
+                                <p class="font-italic mb-1">Lives in New York</p>
+                                <p class="font-italic mb-0">Photographer</p>
+                              </div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-4 text-body">
+                              <p class="lead fw-normal mb-0">Recent activity</p>
+                              <p class="mb-0"><a href="#!" class="text-muted">Show all</a></p>
+                            </div>
+                            <div class="row g-2">
+                              <div class="col mb-2">
+                                <img src="https://mdbcdn.b-cdn.net/img/Photos/Lightbox/Original/img%20(112).webp" alt="image 1"
+                                  class="w-100 rounded-3">
+                              </div>
+                              <div class="col mb-2">
+                                <img src="https://mdbcdn.b-cdn.net/img/Photos/Lightbox/Original/img%20(107).webp" alt="image 1"
+                                  class="w-100 rounded-3">
+                              </div>
+                            </div>
+                            <div class="row g-2">
+                              <div class="col">
+                                <img src="https://mdbcdn.b-cdn.net/img/Photos/Lightbox/Original/img%20(108).webp" alt="image 1"
+                                  class="w-100 rounded-3">
+                              </div>
+                              <div class="col">
+                                <img src="https://mdbcdn.b-cdn.net/img/Photos/Lightbox/Original/img%20(114).webp" alt="image 1"
+                                  class="w-100 rounded-3">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+              </section>
           </div>
         </div>
-
       </main>
-
-      <footer class="text-body-secondary py-5">
-        <div class="container">
-          <p class="float-end mb-1">
-            <a href="#">Back to top</a>
-          </p>
-          <p class="mb-1">Album example is &copy; Bootstrap, but please download and customize it for yourself!</p>
-          <p class="mb-0">New to Bootstrap? <a href="/">Visit the homepage</a> or read our <a href="../getting-started/introduction/">getting started guide</a>.</p>
-        </div>
-      </footer>
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     </body>
 </html>

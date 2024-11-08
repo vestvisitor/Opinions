@@ -8,10 +8,17 @@ from django.contrib import messages
 
 
 def index(request):
-    return render(
-        request,
-        "users/index_page.html"
-    )
+    if request.user.is_authenticated:
+        return render(
+            request,
+            "users/index_page.html",
+            context={"authenticated": True}
+        )
+    else:
+        return render(
+            request,
+            "users/index_page.html"
+        )
 
 
 def signin(request):
@@ -29,9 +36,10 @@ def signin(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             if user.is_active:
+                request.session.set_expiry(300)
                 login(request, user)
                 # Redirect to a success page.
-                return redirect(reverse("users:index"))
+                return redirect(reverse("index"))
         else:
             # Return an 'invalid login' error message.
             messages.error(request, 'username or password not correct')
@@ -74,7 +82,7 @@ def signup(request):
         new_user = User.objects.create_user(username, email, password1)
         new_user.save()
 
-        return redirect(reverse("users:index"))
+        return redirect(reverse("index"))
 
 
 def signout(request):
@@ -83,33 +91,39 @@ def signout(request):
 
         if request.method == "POST":
             logout(request)
-            return redirect(reverse("users:index"))
+            return redirect(reverse("index"))
         else:
             return redirect(reverse("users:signin"))
 
 
 def profile(request, username: str):
 
-    if request.user.is_authenticated and request.user.username == username:
-        return redirect(reverse("users:me"))
-    else:
-        try:
-            user = User.objects.get(username=username)
+    try:
+        user = User.objects.get(username=username)
+    except ObjectDoesNotExist:
+        return redirect(reverse("index"))
 
-        except ObjectDoesNotExist:
-            return HttpResponse("There is no such user!")
+    context = {"user": user}
 
-        return HttpResponse(f"{username}'s page")
+    if request.user.is_authenticated:
+        context["authenticated"] = True
+        if request.user.username == username:
+            return redirect(reverse("users:me"))
+
+    return render(
+        request,
+        "users/user_page.html",
+        context
+    )
 
 
 def me(request):
     if request.user.is_authenticated:
+        user = User.objects.get(username=request.user.username)
         return render(
             request,
             "users/profile_page.html",
-            {
-                "user": request.user
-            }
+            context={"authenticated": True, "user": user}
         )
     else:
         return redirect(reverse("users:signin"))
