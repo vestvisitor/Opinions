@@ -20,8 +20,8 @@ from . import views
 
 app_name = "website"
 urlpatterns = [
-    path("", views.index, name="index"),
     path("cases/", include("cases.urls")),
     path("users/", include("users.urls")),
     path("admin/", admin.site.urls),
+    path("", views.index, name="index"),
 ]

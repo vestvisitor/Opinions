@@ -1,23 +1,28 @@
-from django.http import HttpResponse, HttpResponseRedirect
-import uuid
+from django.db.models import Q
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import redirect, render, reverse
 from django.contrib import messages
 
+from .forms import UserSigninForm, UserSignupForm
 
-def index(request):
+
+def index(request, offset: int | None = 0, limit: int = 5):
+
     if request.user.is_authenticated:
+        users = User.objects.all().filter(~Q(username=request.user.username))[offset:limit]
         return render(
             request,
-            "users/index_page.html",
-            context={"authenticated": True}
+            "users/people_page.html",
+            context={"authenticated": True, "data": users}
         )
     else:
+        users = User.objects.all()[offset:limit]
         return render(
             request,
-            "users/index_page.html"
+            "users/people_page.html",
+            context={"data": users}
         )
 
 
@@ -27,9 +32,15 @@ def signin(request):
         return redirect(reverse("users:me"))
 
     if request.method == "GET":
-        return render(request, "users/signin_page.html")
+
+        return render(
+            request,
+            "users/signin_page.html",
+            {"form": UserSigninForm()}
+            )
 
     elif request.method == "POST":
+
         username = request.POST["username"]
         password = request.POST["password"]
 
@@ -38,11 +49,9 @@ def signin(request):
             if user.is_active:
                 request.session.set_expiry(300)
                 login(request, user)
-                # Redirect to a success page.
                 return redirect(reverse("index"))
         else:
-            # Return an 'invalid login' error message.
-            messages.error(request, 'username or password not correct')
+            messages.error(request, 'incorrect credentials')
             return redirect(reverse("users:signin"))
 
 
@@ -52,14 +61,19 @@ def signup(request):
         return redirect(reverse("users:me"))
 
     if request.method == "GET":
-        return render(request, "users/signup_page.html")
+
+        return render(
+            request,
+            "users/signup_page.html",
+            {"form": UserSignupForm()}
+        )
 
     elif request.method == "POST":
 
         username = request.POST["username"]
         email = request.POST["email"]
-        password1 = request.POST["password1"]
-        password2 = request.POST["password2"]
+        password1 = request.POST["password"]
+        password2 = request.POST["password_confirm"]
 
         try:
             User.objects.get(username=username)

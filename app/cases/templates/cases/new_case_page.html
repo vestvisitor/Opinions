@@ -16,6 +16,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
     {% load static %}
+    {% load crispy_forms_filters %}
+    {% load crispy_forms_tags %}
 
     <style>
       .bd-placeholder-img {
@@ -177,90 +179,58 @@
 
 <main>
 
-  {% if data %}
-    <section class="vh-100" style="background-color: #5f59f7;">
-      <div class="container py-5 h-100">
-        <div class="row d-flex justify-content-center align-items-center h-100">
+  <section style="background-color: #ad655f;">
+  <div class="container my-5 py-5">
+    <div class="row d-flex justify-content-center">
+      <div class="col-md-12 col-lg-10">
+        <div class="card text-body">
+          <div class="container p-4">
+<!--            <form class="flex" action="{% url 'cases:publish' %}" method="post">-->
+<!--              {% csrf_token %}-->
+<!--              <div class="form-group mb-3">-->
+<!--                <label for="caseTitle">Case title</label>-->
+<!--                {% if case %}-->
+<!--                <input type="text" class="form-control" name="caseTitle" id="caseTitle" value="{{ case.case_title }}">-->
+<!--                {% else %}-->
+<!--                <input type="text" class="form-control" name="caseTitle" id="caseTitle">-->
+<!--                {% endif %}-->
+<!--              </div>-->
+<!--              <div class="form-group mb-3">-->
+<!--                {% if case %}-->
 
-          {% if my and authenticated %}
-          <div>
-            <form action="{% url 'cases:publish' %}" method="get" >
-              {% csrf_token %}
-              <button type="submit" class="btn btn-success rounded-pill px-3">New case</button>
-          </form>
-          </div>
-          {% endif %}
+<!--                {{ form }}-->
 
-          <div class="col col-xl-10">
+<!--                {% else %}-->
 
-            {% for case in data %}
+<!--                {{ form }}-->
 
-            <div class="card mb-5" style="border-radius: 15px;">
-              <div class="card-body p-4">
-
-                <div class="d-flex">
-                  <a href="{% url 'cases:case' case.id %}"><h3 class="mb-3">{{ case.case_title }}</h3></a>
-
-                  {% if my and authenticated %}
-                  <form action="{% url 'cases:edit' case.id %}" method="get" >
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-warning mx-3" aria-label="Close">Edit</button>
-                  </form>
-                  <form action="{% url 'cases:delete' case.id %}" method="post" >
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger" aria-label="Close">Delete</button>
-                  </form>
-                  {% endif %}
-                </div>
-
-                <p class="small mb-0"><i class="far fa-star fa-lg"></i> <span class="mx-2">|</span>
-                  {% if case.is_anonymous %}
-                  Created <strong>anonymously</strong>
-                  {% else %}
-                  Created by <a href="{% url 'users:profile' case.creator.username %}"><strong>{{ case.creator.username }}</strong></a>
-                  {% endif %}
-                  on 11 April , 2021</p>
-                <hr class="my-4">
-                <div class="d-flex justify-content-start align-items-center">
-                  {% for tag in case.tags.values %}
-                    <span class="badge bg-primary me-2">#{{ tag.tag_title }}</span>
-                    {% endfor %}
-                    <span class="ms-3 me-4">|</span></p>
-                  <a href="#!">
-                    <img src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/avatar-2.webp" alt="avatar"
-                      class="img-fluid rounded-circle me-3" width="35">
-                  </a>
-                  <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-dark btn-sm btn-floating">
-                    <i class="fas fa-plus text-body"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {% endfor %}
-
+<!--                {% endif %}-->
+<!--              </div>-->
+<!--              <div class="form-group mb-3">-->
+<!--                <label for="caseText">Case description</label>-->
+<!--                {% if case %}-->
+<!--                <textarea class="form-control" name="caseText" id="caseText" rows="10">{{ case.case_text }}</textarea>-->
+<!--                {% else %}-->
+<!--                <textarea class="form-control" name="caseText" id="caseText" rows="10"></textarea>-->
+<!--                {% endif %}-->
+<!--              </div>-->
+<!--              <div class="form-group mb-3">-->
+<!--                {% if case.is_anonymous %}-->
+<!--                <input type="checkbox" class="form-check-input" name="isAnonymous" id="exampleCheck1" checked>-->
+<!--                {% else %}-->
+<!--                <input type="checkbox" class="form-check-input" name="isAnonymous" id="exampleCheck1">-->
+<!--                {% endif %}-->
+<!--                <label class="form-check-label">Post anonymously</label>-->
+<!--              </div>-->
+<!--              <button type="submit" class="btn btn-success">Publish</button>-->
+<!--            </form>-->
+            {% crispy form %}
           </div>
         </div>
       </div>
-    </section>
-
-  {% else %}
-    <section class="vh-100" style="background-color: #5f59f7;">
-      <div class="container py-5 h-100">
-        <div class="row d-flex justify-content-center align-items-center h-100">
-
-          {% if my and authenticated %}
-          <div>
-            <form action="{% url 'cases:publish' %}" method="get" >
-              {% csrf_token %}
-              <button type="submit" class="btn btn-success rounded-pill px-3">New case</button>
-          </form>
-          </div>
-          {% endif %}
-        </div>
-      </div>
-    </section>
-  {% endif %}
+    </div>
+  </div>
+</section>
 
 </main>
 

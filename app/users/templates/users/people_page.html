@@ -177,90 +177,51 @@
 
 <main>
 
-  {% if data %}
-    <section class="vh-100" style="background-color: #5f59f7;">
-      <div class="container py-5 h-100">
-        <div class="row d-flex justify-content-center align-items-center h-100">
-
-          {% if my and authenticated %}
-          <div>
-            <form action="{% url 'cases:publish' %}" method="get" >
-              {% csrf_token %}
-              <button type="submit" class="btn btn-success rounded-pill px-3">New case</button>
-          </form>
-          </div>
-          {% endif %}
-
-          <div class="col col-xl-10">
-
-            {% for case in data %}
-
-            <div class="card mb-5" style="border-radius: 15px;">
-              <div class="card-body p-4">
-
-                <div class="d-flex">
-                  <a href="{% url 'cases:case' case.id %}"><h3 class="mb-3">{{ case.case_title }}</h3></a>
-
-                  {% if my and authenticated %}
-                  <form action="{% url 'cases:edit' case.id %}" method="get" >
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-warning mx-3" aria-label="Close">Edit</button>
-                  </form>
-                  <form action="{% url 'cases:delete' case.id %}" method="post" >
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger" aria-label="Close">Delete</button>
-                  </form>
-                  {% endif %}
-                </div>
-
-                <p class="small mb-0"><i class="far fa-star fa-lg"></i> <span class="mx-2">|</span>
-                  {% if case.is_anonymous %}
-                  Created <strong>anonymously</strong>
-                  {% else %}
-                  Created by <a href="{% url 'users:profile' case.creator.username %}"><strong>{{ case.creator.username }}</strong></a>
-                  {% endif %}
-                  on 11 April , 2021</p>
-                <hr class="my-4">
-                <div class="d-flex justify-content-start align-items-center">
-                  {% for tag in case.tags.values %}
-                    <span class="badge bg-primary me-2">#{{ tag.tag_title }}</span>
-                    {% endfor %}
-                    <span class="ms-3 me-4">|</span></p>
-                  <a href="#!">
-                    <img src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/avatar-2.webp" alt="avatar"
-                      class="img-fluid rounded-circle me-3" width="35">
-                  </a>
-                  <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-dark btn-sm btn-floating">
-                    <i class="fas fa-plus text-body"></i>
-                  </button>
-                </div>
-              </div>
+    {% if data %}
+        <section class="w-100 px-4 py-5 vh-100" style="background-color: #9de2ff; border-radius: .5rem .5rem 0 0;">
+          <div class="row py-5 d-flex justify-content-center">
+            <div class="col col-md-9 col-lg-7 col-xl-6">
+                {% for user in data %}
+                  <div class="card mb-5" style="border-radius: 15px;">
+                    <div class="card-body p-4">
+                      <div class="d-flex">
+                        <div class="flex-shrink-0">
+                          <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-1.webp"
+                            alt="Generic placeholder image" class="img-fluid" style="width: 180px; border-radius: 10px;">
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                          <h5 class="mb-1">{{ user.username }}</h5>
+                          <p class="mb-2 pb-1">Senior Journalist</p>
+                          <div class="d-flex justify-content-start rounded-3 p-2 mb-2 bg-body-tertiary">
+                            <div>
+                              <p class="small text-muted mb-1">Articles</p>
+                              <p class="mb-0">41</p>
+                            </div>
+                            <div class="px-3">
+                              <p class="small text-muted mb-1">Followers</p>
+                              <p class="mb-0">976</p>
+                            </div>
+                            <div>
+                              <p class="small text-muted mb-1">Rating</p>
+                              <p class="mb-0">8.5</p>
+                            </div>
+                          </div>
+                          <div class="d-flex pt-1">
+                            <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-primary me-1 flex-grow-1">Chat</button>
+                            <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary flex-grow-1">Follow</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                {% endfor %}
             </div>
-
-            {% endfor %}
-
           </div>
-        </div>
-      </div>
-    </section>
+        </section>
 
-  {% else %}
-    <section class="vh-100" style="background-color: #5f59f7;">
-      <div class="container py-5 h-100">
-        <div class="row d-flex justify-content-center align-items-center h-100">
-
-          {% if my and authenticated %}
-          <div>
-            <form action="{% url 'cases:publish' %}" method="get" >
-              {% csrf_token %}
-              <button type="submit" class="btn btn-success rounded-pill px-3">New case</button>
-          </form>
-          </div>
-          {% endif %}
-        </div>
-      </div>
-    </section>
-  {% endif %}
+    {% else %}
+        <p>No polls are available.</p>
+    {% endif %}
 
 </main>
 
