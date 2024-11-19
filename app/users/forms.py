@@ -4,6 +4,8 @@ from django.urls import reverse_lazy
 from django.contrib.auth.models import User
 from crispy_forms.helper import FormHelper
 from django.forms import ModelForm
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm, PasswordChangeForm
+from django.core.exceptions import ValidationError
 
 
 class UserSigninForm(ModelForm):
@@ -15,10 +17,6 @@ class UserSigninForm(ModelForm):
         help_texts = {
             'username': None,
             'password': None,
-        }
-        css_class = {
-            'username': "form-control",
-            'password': "form-control",
         }
         labels = {
             'username': "",
@@ -46,21 +44,35 @@ class UserSigninForm(ModelForm):
     helper.form_action = reverse_lazy("users:signin")
 
 
-class UserSignupForm(ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput(), label="")
-    password_confirm = forms.CharField(widget=forms.PasswordInput(), label="")
+class UserSignupForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ["username", "email", "password"]
-        help_texts = {
-            'username': None,
-            'email': None,
-        }
-        labels = {
-            'username': "",
-            'email': "",
-        }
+        fields = ("username", "email", "password1", "password2")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name in ['username', 'email', 'password1', 'password2']:
+            self.fields[field_name].help_text = None
+            self.fields[field_name].label = ""
+
+    def validate_email(self):
+        email = self.cleaned_data.get("email")
+        if (
+            email
+            and self._meta.model.objects.filter(email__iexact=email).exists()
+        ):
+            self._update_errors(
+                ValidationError(
+                    {
+                        "email": self.instance.unique_error_message(
+                            self._meta.model, ["email"]
+                        )
+                    }
+                )
+            )
+        else:
+            return email
 
     helper = FormHelper()
     helper.layout = Layout(
@@ -69,9 +81,9 @@ class UserSignupForm(ModelForm):
         HTML("""<label for="floatingEmail">Email</label>"""),
         Field("email", wrapper_class="form-floating", id="floatingEmail", required=True),
         HTML("""<label for="floatingPassword">Password</label>"""),
-        Field("password", wrapper_class="form-floating", id="floatingPassword"),
+        Field("password1", wrapper_class="form-floating", id="floatingPassword"),
         HTML("""<label for="floatingPassword1">Confrimation password</label>"""),
-        Field("password_confirm", wrapper_class="form-floating", id="floatingPassword1"),
+        Field("password2", wrapper_class="form-floating", id="floatingPassword1"),
         HTML("""{% for message in messages %}
 
                       <div class="alert alert-danger" role="alert">
@@ -86,3 +98,91 @@ class UserSignupForm(ModelForm):
     helper.add_input(Submit('submit', value='Submit', css_class='btn btn-primary w-100 py-2'))
     helper.form_method = 'POST'
     helper.form_action = reverse_lazy("users:signup")
+
+
+class UserEditForm(UserChangeForm):
+
+    def __init__(self, *args, **kwargs):
+        super(UserEditForm, self).__init__(*args, **kwargs)
+        del self.fields['password']
+
+    class Meta:
+        model = User
+        fields = ('username','email')
+        help_texts = {
+            'username': None,
+            'email': None,
+        }
+        labels = {
+            'username': "",
+            'email': "",
+        }
+
+    def validate_email(self):
+        email = self.data.get("email")
+        if (
+                email
+                and self._meta.model.objects.filter(email__iexact=email).exists()
+        ):
+            self._update_errors(
+                ValidationError(
+                    {
+                        "email": self.instance.unique_error_message(
+                            self._meta.model, ["email"]
+                        )
+                    }
+                )
+            )
+        else:
+            return email
+
+    helper = FormHelper()
+    helper.layout = Layout(
+        Div(HTML("""<a href="{% url 'avatar:change' %}">Change your avatar</a>""")),
+        HTML("""<label for="floatingUsername">Username</label>"""),
+        Field("username", wrapper_class="form-floating", id="floatingUsername"),
+        HTML("""<label for="floatingEmail">Email</label>"""),
+        Field("email", wrapper_class="form-floating", id="floatingEmail", required=True),
+        HTML("""<a href="{% url 'users:edit_password' %}">Change password</a>"""),
+        HTML("""{% for message in messages %}
+
+                          <div class="alert alert-danger" role="alert">
+                              <a class="close" href="#" data-dismiss="alert">×</a>
+                              {{ message }}
+                          </div>
+
+                        {% endfor %}"""),
+    )
+
+    helper.add_input(Submit('submit', value='Submit', css_class='btn btn-primary w-100 py-2'))
+    helper.form_method = 'POST'
+
+
+class UserChangePasswordForm(PasswordChangeForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name in ['old_password', 'new_password1', 'new_password2']:
+            self.fields[field_name].help_text = None
+            self.fields[field_name].label = ""
+
+    helper = FormHelper()
+    helper.layout = Layout(
+        HTML("""<label for="floatingOldPassword">Old password</label>"""),
+        Field("old_password", wrapper_class="form-floating", id="floatingOldPassword"),
+        HTML("""<label for="floatingNewPassword">New password</label>"""),
+        Field("new_password1", wrapper_class="form-floating", id="floatingNewPassword", required=True),
+        HTML("""<label for="floatingConfirmation">New confirmation password</label>"""),
+        Field("new_password2", wrapper_class="form-floating", id="floatingConfirmation"),
+        HTML("""{% for message in messages %}
+
+                              <div class="alert alert-danger" role="alert">
+                                  <a class="close" href="#" data-dismiss="alert">×</a>
+                                  {{ message }}
+                              </div>
+
+                            {% endfor %}"""),
+    )
+
+    helper.add_input(Submit('submit', value='Submit', css_class='btn btn-primary w-100 py-2'))
+    helper.form_method = 'POST'

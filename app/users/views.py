@@ -1,29 +1,34 @@
-from django.db.models import Q
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
+from django.http import HttpResponse
 from django.shortcuts import redirect, render, reverse
 from django.contrib import messages
-
-from .forms import UserSigninForm, UserSignupForm
+from .forms import UserSigninForm, UserSignupForm, UserEditForm, UserChangePasswordForm
+from cases.models import Case, Opinion
+from django.contrib.auth.decorators import login_required
 
 
 def index(request, offset: int | None = 0, limit: int = 5):
 
     if request.user.is_authenticated:
-        users = User.objects.all().filter(~Q(username=request.user.username))[offset:limit]
-        return render(
-            request,
-            "users/people_page.html",
-            context={"authenticated": True, "data": users}
-        )
+        context = {"authenticated": True}
+        users = User.objects.exclude(username=request.user.username).all()[offset:limit]
     else:
+        context = {"authenticated": False}
         users = User.objects.all()[offset:limit]
-        return render(
-            request,
-            "users/people_page.html",
-            context={"data": users}
-        )
+
+    for user in users:
+        user.cases_number = Case.objects.filter(creator=user.id).count()
+        user.opinions_number = Opinion.objects.filter(creator=user.id).count()
+
+    context["data"] = users
+
+    return render(
+        request,
+        "users/people_page.html",
+        context
+    )
 
 
 def signin(request):
@@ -41,18 +46,18 @@ def signin(request):
 
     elif request.method == "POST":
 
-        username = request.POST["username"]
-        password = request.POST["password"]
+        form = UserSigninForm(request.POST)
 
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            if user.is_active:
-                request.session.set_expiry(300)
-                login(request, user)
-                return redirect(reverse("index"))
-        else:
-            messages.error(request, 'incorrect credentials')
-            return redirect(reverse("users:signin"))
+        if not form.is_valid():
+            user = authenticate(request, username=form.data['username'], password=form.data['password'])
+            if user is not None:
+                if user.is_active:
+                    request.session.set_expiry(300*30)
+                    login(request, user)
+                    return redirect(reverse("index"))
+
+        messages.error(request, 'incorrect credentials')
+        return redirect(reverse("users:signin"))
 
 
 def signup(request):
@@ -70,44 +75,35 @@ def signup(request):
 
     elif request.method == "POST":
 
-        username = request.POST["username"]
-        email = request.POST["email"]
-        password1 = request.POST["password"]
-        password2 = request.POST["password_confirm"]
+        form = UserSignupForm(request.POST)
 
-        try:
-            User.objects.get(username=username)
-            messages.error(request, "account with this username already exists")
-            return redirect(reverse("users:signup"))
-        except User.DoesNotExist:
-            pass
+        if form.is_valid() and form.validate_email():
 
-        try:
-            User.objects.get(email=email)
-            messages.error(request, "account with this email already exists")
-            return redirect(reverse("users:signup"))
-        except User.DoesNotExist:
-            pass
+            data = form.clean()
 
-        if password1 != password2:
-            messages.error(request, "passwords don't match")
-            return redirect(reverse("users:signup"))
+            new_user = User.objects.create_user(
+                data["username"],
+                data["email"],
+                data["password1"]
+            )
+            new_user.save()
 
-        new_user = User.objects.create_user(username, email, password1)
-        new_user.save()
-
-        return redirect(reverse("index"))
-
-
-def signout(request):
-
-    if request.user.is_authenticated:
-
-        if request.method == "POST":
-            logout(request)
             return redirect(reverse("index"))
-        else:
-            return redirect(reverse("users:signin"))
+
+        return render(
+            request,
+            "users/signup_page.html",
+            {"form": form}
+        )
+
+
+@login_required(login_url="/users/signin")
+def signout(request):
+    if request.method == "POST":
+        logout(request)
+        return redirect(reverse("index"))
+    else:
+        return redirect(reverse("users:signin"))
 
 
 def profile(request, username: str):
@@ -117,7 +113,11 @@ def profile(request, username: str):
     except ObjectDoesNotExist:
         return redirect(reverse("index"))
 
-    context = {"user": user}
+    context = {
+        "user": user,
+        "cases": Case.objects.filter(creator=user.id).count(),
+        "opinions": Opinion.objects.filter(creator=user.id).count()
+    }
 
     if request.user.is_authenticated:
         context["authenticated"] = True
@@ -131,13 +131,95 @@ def profile(request, username: str):
     )
 
 
+@login_required(login_url="/users/signin")
 def me(request):
-    if request.user.is_authenticated:
-        user = User.objects.get(username=request.user.username)
+    user = User.objects.get(username=request.user.username)
+
+    context = {
+        "authenticated": True,
+        "user": User.objects.get(username=request.user.username),
+        "cases": Case.objects.filter(creator=user.id).count(),
+        "opinions": Opinion.objects.filter(creator=user.id).count()
+    }
+
+    return render(
+        request,
+        "users/profile_page.html",
+        context
+    )
+
+
+@login_required(login_url="/users/signin")
+def edit_profile(request):
+
+    context = {"authenticated": True}
+
+    if request.method == "GET":
+        context["form"] = UserEditForm(
+            initial={
+                "username": request.user.username,
+                "email": request.user.email,
+            }
+        )
         return render(
             request,
-            "users/profile_page.html",
-            context={"authenticated": True, "user": user}
+            "users/edit_profile_page.html",
+            context
         )
-    else:
-        return redirect(reverse("users:signin"))
+    elif request.method == "POST":
+
+        form = UserEditForm(request.POST, instance=request.user)
+
+        new_username = form.data.get('username')
+        if new_username != request.user.username:
+            try:
+                user = form.save(commit=False)
+                user.username = new_username
+            except ValueError:
+                pass
+
+        new_email = form.data.get('email')
+        if new_email != form.initial.get('email'):
+            try:
+                 if form.validate_email():
+                    user.email = new_email
+            except ValueError:
+                pass
+
+        if not form.errors:
+            form.save()
+            return redirect(reverse("users:edit"))
+        else:
+            context['form'] =form
+            return render(
+                request,
+                "users/edit_profile_page.html",
+                context
+            )
+
+
+@login_required(login_url="/users/signin")
+def edit_password(request):
+
+    context = {"authenticated": True}
+
+    if request.method == "GET":
+        context["form"] = UserChangePasswordForm(request.user)
+        return render(
+            request,
+            "users/edit_profile_page.html",
+            context
+        )
+    elif request.method == "POST":
+
+        form = UserChangePasswordForm(user=request.user, data=request.POST)
+        if form.is_valid():
+            form.save()
+            update_session_auth_hash(request, form.user)
+
+        context['form'] = form
+        return render(
+            request,
+            "users/edit_profile_page.html",
+            context
+        )

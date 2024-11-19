@@ -11,6 +11,7 @@ urlpatterns = [
     path("delete/<int:case_id>/", views.delete, name="delete"),
     path("edit/<int:case_id>/", views.edit, name="edit"),
     path("publish/", views.publish, name="publish"),
+    path("opinions/", views.my_opinions, name="opinions"),
     path("my/", views.my_cases, name="my_cases"),
     path("", views.index, name="index"),
 ]

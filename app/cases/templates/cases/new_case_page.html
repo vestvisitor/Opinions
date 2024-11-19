@@ -142,7 +142,7 @@
                         <a class="nav-link active" href="{% url 'cases:my_cases' %}">My cases</a>
                       </li>
                       <li class="nav-item">
-                        <a class="nav-link active" href="#">My opinions</a>
+                        <a class="nav-link active" href="{% url 'cases:opinions' %}">My opinions</a>
                       </li>
                     </ul>
                   </li>
@@ -185,45 +185,6 @@
       <div class="col-md-12 col-lg-10">
         <div class="card text-body">
           <div class="container p-4">
-<!--            <form class="flex" action="{% url 'cases:publish' %}" method="post">-->
-<!--              {% csrf_token %}-->
-<!--              <div class="form-group mb-3">-->
-<!--                <label for="caseTitle">Case title</label>-->
-<!--                {% if case %}-->
-<!--                <input type="text" class="form-control" name="caseTitle" id="caseTitle" value="{{ case.case_title }}">-->
-<!--                {% else %}-->
-<!--                <input type="text" class="form-control" name="caseTitle" id="caseTitle">-->
-<!--                {% endif %}-->
-<!--              </div>-->
-<!--              <div class="form-group mb-3">-->
-<!--                {% if case %}-->
-
-<!--                {{ form }}-->
-
-<!--                {% else %}-->
-
-<!--                {{ form }}-->
-
-<!--                {% endif %}-->
-<!--              </div>-->
-<!--              <div class="form-group mb-3">-->
-<!--                <label for="caseText">Case description</label>-->
-<!--                {% if case %}-->
-<!--                <textarea class="form-control" name="caseText" id="caseText" rows="10">{{ case.case_text }}</textarea>-->
-<!--                {% else %}-->
-<!--                <textarea class="form-control" name="caseText" id="caseText" rows="10"></textarea>-->
-<!--                {% endif %}-->
-<!--              </div>-->
-<!--              <div class="form-group mb-3">-->
-<!--                {% if case.is_anonymous %}-->
-<!--                <input type="checkbox" class="form-check-input" name="isAnonymous" id="exampleCheck1" checked>-->
-<!--                {% else %}-->
-<!--                <input type="checkbox" class="form-check-input" name="isAnonymous" id="exampleCheck1">-->
-<!--                {% endif %}-->
-<!--                <label class="form-check-label">Post anonymously</label>-->
-<!--              </div>-->
-<!--              <button type="submit" class="btn btn-success">Publish</button>-->
-<!--            </form>-->
             {% crispy form %}
           </div>
         </div>

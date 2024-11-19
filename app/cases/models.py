@@ -26,10 +26,15 @@ class Case(models.Model):
 
 class Opinion(models.Model):
     opinion_text = models.CharField(max_length=1000)
-    pub_date = models.DateTimeField("date published")
+    pub_date = models.DateTimeField(timezone.now())
     is_anonymous = models.BooleanField(default=False)
     case = models.ForeignKey(Case, on_delete=models.CASCADE)
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.opinion_text[:20]
+
+
+class CaseOpinion(models.Model):
+    case = models.OneToOneField(Case, on_delete=models.CASCADE)
+    opinion = models.OneToOneField(Opinion, on_delete=models.CASCADE)

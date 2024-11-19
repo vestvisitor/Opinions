@@ -2,7 +2,7 @@ from annotated_types.test_cases import cases
 from crispy_forms.layout import Submit
 from django import forms
 from django.urls import reverse_lazy
-from .models import Case, Opinion
+from .models import Case, Opinion, CaseOpinion
 from crispy_forms.helper import FormHelper
 from django.forms import ModelForm
 

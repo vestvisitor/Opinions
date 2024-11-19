@@ -18,6 +18,7 @@
     {% load static %}
     {% load crispy_forms_filters %}
     {% load crispy_forms_tags %}
+    {% load avatar_tags %}
 
     <style>
       .bd-placeholder-img {
@@ -142,7 +143,7 @@
                         <a class="nav-link active" href="{% url 'cases:my_cases' %}">My cases</a>
                       </li>
                       <li class="nav-item">
-                        <a class="nav-link active" href="#">My opinions</a>
+                        <a class="nav-link active" href="{% url 'cases:opinions' %}">My opinions</a>
                       </li>
                     </ul>
                   </li>
@@ -190,20 +191,17 @@
             <div class="d-flex flex-start">
               {% if case.is_anonymous %}
               <img class="rounded-circle shadow-1-strong me-3"
-                src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(23).webp" alt="avatar" width="60"
-                height="60" />
+                    src="{% static 'users/images/logo.png' %}" alt="avatar" width="80" height="80"/>
               <div>
                 <h6 class="fw-bold mb-1">Anonymous</h6>
               {% else %}
-                <img class="rounded-circle shadow-1-strong me-3"
-                src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(23).webp" alt="avatar" width="60"
-                height="60" />
+                {% avatar case.creator 60 60 class="rounded-circle shadow-1-strong me-3" %}
               <div>
                 <a href="{% url 'users:profile' case.creator.username %}"><h6 class="fw-bold mb-1">{{ case.creator.username }}</h6></a>
               {% endif %}
                 <div class="d-flex align-items-center mb-3">
                   <p class="mb-0">
-                    March 07, 2021
+                    {{ case.pub_date.date }}
                     {% for tag in case.tags.values %}
                     <span class="badge bg-primary">#{{ tag.tag_title }}</span>
                     {% endfor %}
@@ -241,20 +239,17 @@
                 <div class="d-flex flex-start">
                   {% if opinion.is_anonymous %}
                   <img class="rounded-circle shadow-1-strong me-3"
-                    src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(24).webp" alt="avatar" width="60"
-                    height="60" />
+                    src="{% static 'users/images/logo.png' %}" alt="avatar" width="80" height="80"/>
                   <div>
                     <h6 class="fw-bold mb-1">Anonymous</h6>
                   {% else %}
-                    <img class="rounded-circle shadow-1-strong me-3"
-                    src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(23).webp" alt="avatar" width="60"
-                    height="60" />
+                    {% avatar opinion.creator 60 60 class="rounded-circle shadow-1-strong me-3" %}
                   <div>
                     <a href="{% url 'users:profile' opinion.creator.username %}"><h6 class="fw-bold mb-1">{{ opinion.creator.username }}</h6></a>
                   {% endif %}
                     <div class="d-flex align-items-center mb-3">
                       <p class="mb-0">
-                        March 07, 2021
+                        {{ opinion.pub_date.date }}
                       </p>
                     </div>
                     <p class="mb-0">{{ opinion.opinion_text }}</p>
@@ -273,8 +268,12 @@
   {% if form %}
   <div class="container p-4">
     <div class="card text-body p-4">
+      {% if restrict %}
+      <h4 class="d-flex justify-content-center mb-4">You've already expressed your opinion!</h4>
+      {% else %}
       <h4 class="d-flex justify-content-center mb-4">Share your opinion</h4>
       {% crispy form %}
+      {% endif %}
       {% endif %}
       {% endif %}
       </div>
