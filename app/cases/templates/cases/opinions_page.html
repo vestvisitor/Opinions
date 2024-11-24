@@ -177,14 +177,14 @@
 
 <main>
 
-  {% if data %}
+  {% if page_obj %}
     <section class="vh-100" style="background-color: #5f59f7;">
       <div class="container py-5 h-100">
         <div class="row d-flex justify-content-center align-items-center h-100">
 
           <div class="col col-xl-10">
 
-            {% for opinion in data %}
+            {% for opinion in page_obj %}
 
             <div class="card mb-5" style="border-radius: 15px;">
               <div class="card-body p-4">
@@ -205,19 +205,30 @@
                   {% for tag in opinion.case.tags.values %}
                     <span class="badge bg-primary me-2">#{{ tag.tag_title }}</span>
                   {% endfor %}
-                    <span class="ms-3 me-4">|</span></p>
-                  <a href="#!">
-                    <img src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/avatar-2.webp" alt="avatar"
-                      class="img-fluid rounded-circle me-3" width="35">
-                  </a>
-                  <button  type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-dark btn-sm btn-floating">
-                    <i class="fas fa-plus text-body"></i>
-                  </button>
                 </div>
               </div>
             </div>
 
             {% endfor %}
+            <div class="d-flex justify-content-center">
+                  <span class="current">
+                          Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                </span>
+              </div>
+              <div class="pagination d-flex justify-content-center">
+                  <ul class="pagination">
+                      {% if page_obj.has_previous %}
+                          <li class="page-item"><a class="page-link" href="?page=1">&laquo; first</a></li>
+                           <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">previous</a></li>
+                      {% endif %}
+
+                      {% if page_obj.has_next %}
+                           <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">next</a></li>
+                           <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a></li>
+                      {% endif %}
+                  </ul>
+              </div>
+          </div>
 
           </div>
         </div>

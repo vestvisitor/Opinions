@@ -1,28 +1,32 @@
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
-from django.http import HttpResponse
 from django.shortcuts import redirect, render, reverse
 from django.contrib import messages
 from .forms import UserSigninForm, UserSignupForm, UserEditForm, UserChangePasswordForm
 from cases.models import Case, Opinion
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 
 
-def index(request, offset: int | None = 0, limit: int = 5):
+def index(request):
+    context = {}
 
     if request.user.is_authenticated:
-        context = {"authenticated": True}
-        users = User.objects.exclude(username=request.user.username).all()[offset:limit]
+        context["authenticated"] = True
+        users = User.objects.exclude(username=request.user.username).order_by('id')
     else:
-        context = {"authenticated": False}
-        users = User.objects.all()[offset:limit]
+        users = User.objects.get_queryset().order_by('id')
 
     for user in users:
         user.cases_number = Case.objects.filter(creator=user.id).count()
         user.opinions_number = Opinion.objects.filter(creator=user.id).count()
 
-    context["data"] = users
+    paginator = Paginator(users, 5)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    context["page_obj"] = page_obj
 
     return render(
         request,
@@ -55,6 +59,7 @@ def signin(request):
                     request.session.set_expiry(300*30)
                     login(request, user)
                     return redirect(reverse("index"))
+
 
         messages.error(request, 'incorrect credentials')
         return redirect(reverse("users:signin"))
@@ -93,7 +98,8 @@ def signup(request):
         return render(
             request,
             "users/signup_page.html",
-            {"form": form}
+            {"form": form},
+            status=409
         )
 
 
@@ -111,7 +117,7 @@ def profile(request, username: str):
     try:
         user = User.objects.get(username=username)
     except ObjectDoesNotExist:
-        return redirect(reverse("index"))
+        return redirect(reverse("users:index"))
 
     context = {
         "user": user,
@@ -182,6 +188,7 @@ def edit_profile(request):
         if new_email != form.initial.get('email'):
             try:
                  if form.validate_email():
+                    user = form.save(commit=False)
                     user.email = new_email
             except ValueError:
                 pass

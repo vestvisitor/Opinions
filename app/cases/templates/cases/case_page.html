@@ -264,30 +264,30 @@
 
   {% endfor %}
 
-  {% if authenticated %}
-  {% if form %}
+  {% if not same %}
   <div class="container p-4">
     <div class="card text-body p-4">
-      {% if restrict %}
-      <h4 class="d-flex justify-content-center mb-4">You've already expressed your opinion!</h4>
+
+      {% if authenticated and form %}
+        <h4 class="d-flex justify-content-center mb-4">Share your opinion</h4>
+        {% crispy form %}
       {% else %}
-      <h4 class="d-flex justify-content-center mb-4">Share your opinion</h4>
-      {% crispy form %}
+      <h4 class="d-flex justify-content-center mb-4">You've already expressed your opinion!</h4>
       {% endif %}
-      {% endif %}
-      {% endif %}
-      </div>
+
+    </div>
   </div>
+  {% endif %}
 
   {% else %}
 
-  {% if form %}
   <div class="container p-4">
     <div class="card text-body p-4">
-      {% if authenticated %}
-      <h4 class="d-flex justify-content-center mb-4">There are no opinions yet, be the first!</h4>
-      {% crispy form %}
-      {% endif %}
+      {% if authenticated and form %}
+        <h4 class="d-flex justify-content-center mb-4">There are no opinions yet, be the first!</h4>
+        {% crispy form %}
+      {% else %}
+        <h4 class="d-flex justify-content-center mb-4">There are no opinions yet,<a href="{% url 'users:signin' %}"> sign in </a>and be the first!</h4>
       {% endif %}
     </div>
   </div>

@@ -36,5 +36,5 @@ class Opinion(models.Model):
 
 
 class CaseOpinion(models.Model):
-    case = models.OneToOneField(Case, on_delete=models.CASCADE)
-    opinion = models.OneToOneField(Opinion, on_delete=models.CASCADE)
+    case = models.ForeignKey(Case, on_delete=models.CASCADE)
+    opinion = models.ForeignKey(Opinion, on_delete=models.CASCADE)

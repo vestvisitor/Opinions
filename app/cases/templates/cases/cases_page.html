@@ -178,20 +178,23 @@
 
 <main>
 
-  {% if data %}
-    <section class="vh-100" style="background-color: #5f59f7;">
+  {% if page_obj %}
+    <section class="px-4 py-5" style="background-color: #5f59f7;">
       <div class="container py-5 h-100">
         <div class="row d-flex justify-content-center align-items-center h-100">
 
           {% if my and authenticated %}
-          <div>
-              <button type="submit" onclick="{% url 'cases:publish' %}" class="btn btn-success rounded-pill px-3">New case</button>
+          <div class="pb-4">
+              <form action="{% url 'cases:publish' %}" method="get" >
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success rounded-pill px-3">New case</button>
+              </form>
           </div>
           {% endif %}
 
           <div class="col col-xl-10">
 
-            {% for case in data %}
+            {% for case in page_obj %}
 
             <div class="card mb-5" style="border-radius: 15px;">
               <div class="card-body p-4">
@@ -241,7 +244,24 @@
             </div>
 
             {% endfor %}
+          <div class="d-flex justify-content-center">
+                  <span class="current">
+                          Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                </span>
+              </div>
+              <div class="pagination d-flex justify-content-center">
+                  <ul class="pagination">
+                      {% if page_obj.has_previous %}
+                          <li class="page-item"><a class="page-link" href="?page=1">&laquo; first</a></li>
+                           <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">previous</a></li>
+                      {% endif %}
 
+                      {% if page_obj.has_next %}
+                           <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">next</a></li>
+                           <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a></li>
+                      {% endif %}
+                  </ul>
+              </div>
           </div>
         </div>
       </div>
@@ -257,7 +277,7 @@
             <form action="{% url 'cases:publish' %}" method="get" >
               {% csrf_token %}
               <button type="submit" class="btn btn-success rounded-pill px-3">New case</button>
-          </form>
+            </form>
           </div>
           {% endif %}
         </div>

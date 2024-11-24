@@ -175,14 +175,12 @@
             </div>
         </nav>
     </header>
-
 <main>
-
-    {% if data %}
-        <section class="w-100 px-4 py-5 vh-100" style="background-color: #9de2ff; border-radius: .5rem .5rem 0 0;">
+    {% if page_obj %}
+        <section class="px-4 py-5" style="background-color: #9de2ff; border-radius: .5rem .5rem 0 0;">
           <div class="row py-5 d-flex justify-content-center">
             <div class="col col-md-9 col-lg-7 col-xl-6">
-                {% for user in data %}
+                {% for user in page_obj %}
                   <div class="card mb-5" style="border-radius: 15px;">
                     <div class="card-body p-4">
                       <div class="d-flex">
@@ -210,16 +208,32 @@
                     </div>
                   </div>
                 {% endfor %}
+              <div class="d-flex justify-content-center">
+                  <span class="current">
+                          Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                </span>
+              </div>
+              <div class="pagination d-flex justify-content-center">
+                  <ul class="pagination">
+                      {% if page_obj.has_previous %}
+                          <li class="page-item"><a class="page-link" href="?page=1">&laquo; first</a></li>
+                           <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">previous</a></li>
+                      {% endif %}
+
+                      {% if page_obj.has_next %}
+                           <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">next</a></li>
+                           <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a></li>
+                      {% endif %}
+                  </ul>
+              </div>
             </div>
           </div>
         </section>
-
     {% else %}
-        <p>No polls are available.</p>
+        <p>No users have registered yet.</p>
     {% endif %}
 
 </main>
-
 <footer class="text-body-secondary py-5">
   <div class="container">
     <p class="float-end mb-1">
