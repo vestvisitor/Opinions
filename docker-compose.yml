@@ -1,0 +1,28 @@
+version: "3"
+
+services:
+  pgdb:
+    image: postgres
+    container_name: pgdb
+    volumes:
+      - pgdbdata:/var/lib/postgresql/data/
+    env_file:
+      - app/.env
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB_NAME}
+      - POSTGRES_USER=${POSTGRES_DB_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_DB_PASSWORD}
+
+  django:
+    build: .
+    container_name: django
+    command: python app/manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    ports:
+      - 8000:8000
+    depends_on:
+      - pgdb
+
+volumes:
+  pgdbdata: null
