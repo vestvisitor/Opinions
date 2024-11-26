@@ -193,7 +193,7 @@ def opinion(request, case_id: int):
     if request.method == "POST":
 
         try:
-            requested_case = Case.objects.get(id=case_id)
+            requested_case = Case.objects.get(id=request.POST['caseid'])
 
         except Case.DoesNotExist:
             return render(
@@ -206,7 +206,7 @@ def opinion(request, case_id: int):
         condition1 = Q(case=requested_case)
         condition2 = Q(opinion__creator=request.user)
         if not CaseOpinion.objects.filter(condition1 & condition2).first():
-            form_data = OpinionCreateForm(request.POST, case_id=case_id)
+            form_data = OpinionCreateForm(request.POST, case_id=request.POST['caseid'])
 
             if form_data.is_valid():
                 user_opinion = form_data.save(commit=False)
